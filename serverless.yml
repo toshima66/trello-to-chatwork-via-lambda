@@ -60,8 +60,11 @@ functions:
     handler: handler.hello
     events:
       - http:
-          path: hello
-          method: get
+          path: trello-call-back
+          method: head
+      - http:
+          path: trello-call-back
+          method: post
 #      - s3: ${env:BUCKET}
 #      - schedule: rate(10 minutes)
 #      - sns: greeter-topic
