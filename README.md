@@ -45,4 +45,10 @@ $ aws --profile serverless ssm put-parameter --name CHATWORK_API_TOKEN --type St
 $ aws --profile serverless ssm put-parameter --name CHATWORK_ROOM_ID --type String --value xxxxxxxx
 ```
 
+overwrite
+```
+$ aws --profile serverless ssm put-parameter --overwrite --name CHATWORK_ROOM_ID --type String --value xxxxxxxx
+```
+
+
 see: [Handling Secrets for Small Teams & Projects](https://serverless.com/blog/serverless-secrets-api-keys/)
