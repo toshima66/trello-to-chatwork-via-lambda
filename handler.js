@@ -3,6 +3,10 @@
 var querystring = require('querystring');
 var https = require('https');
 
+const chatwork_api_token = process.env.CHATWORK_API_TOKEN;
+const chatwork_room_id = process.env.CHATWORK_ROOM_ID;
+const chatwork_host = 'api.chatwork.com';
+
 class Trello {
   constructor(event) {
     this.json = JSON.parse(event.body);
@@ -10,7 +14,7 @@ class Trello {
   }
 
   isTarget() { return ('commentCard' === this.actionType); }
-};
+}
 
 class Chatwork {
   constructor(context, trello) {
@@ -29,72 +33,61 @@ class Chatwork {
     console.log('is target');
     console.log(t.json.action.data.text);
 
-    post();
-
-    return response();
+    this.post(t.json.action.data.text);
   }
 
-  post() {
-    var req = https.request(postOptions(), function(res) {
+  post(message) {
+    var c = this;
+    var data = this.data(message);
+    var req = https.request(this.postOptions(data), function(res) {
       res.setEncoding('utf8');
       res.on('data', function (body) {
         console.log(body);
-        succeed();
+        c.response();
       });
     }).on('error', function(e) {
-      error();
+      console.log(`error: ${e}`);
+      c.response();
     });
 
     req.write(data);
     req.end();
   }
 
-  data() {
-    // TODO
-    // trello json to chatwork
-    // XXX が YYY にコメントしました
-    // xxxxxxxxxx
-    // xxxxxxxxxx
-//    var data = querystring.stringify({
-//        body: 'hoge121@example.com'
-//    });
-  }
-
-  postOptions() {
-    hostname: '${host}',
-    port: ${port},
-    path: '${path}',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Content-Length': Buffer.byteLength(data()),
-      'X-ChatWorkToken': '${chatwork_token}'
+  response() {
+    let response = {
+      'statusCode': 200,
+      'headers': { 'Content-Type': 'text/plain' },
+      'body': 'finish'
     }
+    this.context.succeed(response)
   }
 
-  succeed() {
+  data(message) {
+    return querystring.stringify({ body: message });
+  }
+
+  postOptions(data) {
     return {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: 'OK',
-        input: event,
-      }),
+      hostname: chatwork_host,
+      port: 443,
+      path: this.path(),
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(data),
+        'X-ChatWorkToken': chatwork_api_token
+      }
     };
   }
 
-  error() {
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: 'NG',
-        input: event,
-      }),
-    };
+  path() {
+    return `/v2/rooms/${chatwork_room_id}/messages`;
   }
-};
+}
 
-module.exports.hello = (event, context, callback) => {
+module.exports.hello = (event, context) => {
   const t = new Trello(event);
   const c = new Chatwork(context, t);
-  callback(null, c.notify());
+  c.notify();
 };
