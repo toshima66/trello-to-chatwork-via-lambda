@@ -1,4 +1,7 @@
 service: aws-nodejs # NOTE: update this with your service name
+package:
+  exclude:
+    - secrets.yml
 provider:
   name: aws
   runtime: nodejs8.10
