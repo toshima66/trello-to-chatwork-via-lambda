@@ -33,3 +33,16 @@ https://api.trello.com/1/tokens/{APIToken}/webhooks/ \
   "description": "My first webhook"
 }'
 ```
+
+## Chatwork API
+
+TODO
+
+### Environments
+
+```
+$ aws --profile serverless ssm put-parameter --name CHATWORK_API_TOKEN --type String --value xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+$ aws --profile serverless ssm put-parameter --name CHATWORK_ROOM_ID --type String --value xxxxxxxx
+```
+
+see: [Handling Secrets for Small Teams & Projects](https://serverless.com/blog/serverless-secrets-api-keys/)
