@@ -33,12 +33,22 @@ class Chatwork {
     console.log('is target');
     console.log(t.json.action.data.text);
 
-    this.post(t.json.action.data.text);
+    this.post();
   }
 
-  post(message) {
+  message() {
+    const j = this.trello.json;
+    var comment = j.action.data.text;
+    var cardName = j.action.data.card.name;
+    var userName = j.action.memberCreator.username;
+    var shortLink = 'https://trello.com/c/' + j.action.data.card.shortLink;
+
+    return `[info][title]${cardName} - ${shortLink}[/title]${comment}\n[hr]by ${userName}[/info]`;
+  }
+
+  post() {
     var c = this;
-    var data = this.data(message);
+    var data = this.data();
     var req = https.request(this.postOptions(data), function(res) {
       res.setEncoding('utf8');
       res.on('data', function (body) {
@@ -63,8 +73,8 @@ class Chatwork {
     this.context.succeed(response)
   }
 
-  data(message) {
-    return querystring.stringify({ body: message });
+  data() {
+    return querystring.stringify({ body: this.message() });
   }
 
   postOptions(data) {
